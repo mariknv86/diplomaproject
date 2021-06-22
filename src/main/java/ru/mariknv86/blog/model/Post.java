@@ -38,7 +38,7 @@ public class Post {
     @Column(name = "is_active", nullable = false)
     private byte isActive;
 
-    @Column(name = "moderation_status", nullable = false)
+    @Column(name = "moderation_status", columnDefinition="ENUM('NEW','ACCEPTED', 'DECLINED')", nullable = false)
     @Enumerated(EnumType.STRING)
     private ModerationStatus moderationStatus;
 
