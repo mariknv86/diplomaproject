@@ -74,7 +74,7 @@ spring:
 
   datasource:
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/blog?useTimezone=true&serverTimezone=GMT&useSSL=false
+    url: jdbc:mysql://localhost:3306/blog?createDatabaseIfNotExist=true&useTimezone=true&serverTimezone=GMT&useSSL=false&allowPublicKeyRetrieval=true
     username: root
     password: testtest
     hikari:
@@ -92,7 +92,3 @@ spring:
   flyway:
     check-location: true
     locations: classpath:db/migration
-    url: jdbc:mysql://localhost:3306
-    schemas: BLOG
-    user: "root"
-    password: "testtest"
