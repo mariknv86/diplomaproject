@@ -1,6 +1,5 @@
 package ru.mariknv86.blog.dto.response;
 
-import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -10,10 +9,10 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PostListDto {
+public class TagDto {
 
-    private int count;
+    private String name;
 
-    List<PostDto> posts;
+    private float weight;
 
 }

@@ -15,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -44,11 +45,11 @@ public class Post {
 
     @ManyToOne
     @JoinColumn(name = "moderator_id")
-    private User moderatorId;
+    private User moderator;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User userId;
+    private User user;
 
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
     private LocalDateTime time;
@@ -69,6 +70,14 @@ public class Post {
         inverseJoinColumns = {@JoinColumn(name = "tag_id")}
     )
     private List<Tag> tagList;
+
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
+    private List<PostVote> votes;
+
+    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
+    private List<PostComment> comments;
+
+
 
     public void incrementUserView() {
         setViewCount(getViewCount() + 1);

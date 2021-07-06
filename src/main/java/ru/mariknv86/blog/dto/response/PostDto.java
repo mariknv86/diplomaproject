@@ -1,6 +1,5 @@
 package ru.mariknv86.blog.dto.response;
 
-import java.sql.Timestamp;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +13,7 @@ public class PostDto {
 
     private int id;
 
-    private Timestamp timestamp;
+    private long timestamp;
 
     private UserForPostDto user;
 

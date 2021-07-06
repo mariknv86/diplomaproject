@@ -27,7 +27,7 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
                 + "group by posts.id "
                 + "order by count(post_comments.post_id) desc",
         nativeQuery = true)
-    List<Post> mostPopularPosts(Pageable pageable);
+    List<Post> getMostPopularPosts(Pageable pageable);
 
     /**
      * Запрос для api/post/best
@@ -43,7 +43,7 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
                 + "group by posts.id "
                 + "order by count(post_votes.post_id) desc",
         nativeQuery = true)
-    List<Post> bestPosts(Pageable pageable);
+    List<Post> getBestPosts(Pageable pageable);
 
     /**
      * запрос общего количества постов для запроса api/post

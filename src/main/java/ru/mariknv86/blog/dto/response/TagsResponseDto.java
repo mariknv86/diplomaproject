@@ -10,10 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PostListDto {
+public class TagsResponseDto {
 
-    private int count;
-
-    List<PostDto> posts;
+    List<TagDto> tags;
 
 }
