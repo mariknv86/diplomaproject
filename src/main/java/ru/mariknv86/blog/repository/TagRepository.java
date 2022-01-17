@@ -11,7 +11,7 @@ public interface TagRepository extends JpaRepository<Tag, Integer> {
 
     List<Tag> findAllByNameContaining(String query);
 
-    @Query(nativeQuery = true, value = "select count(*) from tag2post where tag_id = :tagId")
+    @Query(nativeQuery = true, value = "SELECT COUNT(*) FROM tag2post WHERE tag_id = :tagId")
     int getTagLinksCount(int tagId);
 
     @Query(

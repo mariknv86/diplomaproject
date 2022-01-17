@@ -16,7 +16,8 @@
 
 	<properties>
 		<java.version>11</java.version>
-		<org.projectlombok.version>1.18.10</org.projectlombok.version>
+		<org.projectlombok.version>1.18.22</org.projectlombok.version>
+		<org.mapstruct.version>1.4.2.Final</org.mapstruct.version>
 	</properties>
 
 
@@ -42,10 +43,10 @@
 
 
 		<!--spring dependency-->
-<!--		<dependency>-->
-<!--			<groupId>org.springframework.boot</groupId>-->
-<!--			<artifactId>spring-boot-starter-security</artifactId>-->
-<!--		</dependency>-->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -73,33 +74,70 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
+<!--		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-devtools</artifactId>
 			<scope>runtime</scope>
 			<optional>true</optional>
-		</dependency>
+		</dependency>-->
 
 		<!-- libs -->
 		<dependency>
+			<groupId>com.bladejava</groupId>
+			<artifactId>blade-patchca</artifactId>
+			<version>1.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mapstruct</groupId>
+			<artifactId>mapstruct</artifactId>
+			<version>${org.mapstruct.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.validation</groupId>
+			<artifactId>jakarta.validation-api</artifactId>
+			<version>2.0.2</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>${org.projectlombok.version}</version>
-			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+							<version>${org.projectlombok.version}</version>
+						</path>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>${org.mapstruct.version}</version>
+						</path>
+					</annotationProcessorPaths>
+					<compilerArgs>
+						<arg>-Amapstruct.defaultComponentModel=spring</arg>
+						<arg>-Amapstruct.unmappedTargetPolicy=WARN</arg>
+						<arg>-Amapstruct.suppressGeneratorTimestamp=true</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<configuration>
-					<excludes>
+					<!--<excludes>
 						<exclude>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 						</exclude>
-					</excludes>
+					</excludes>-->
 				</configuration>
 			</plugin>
 		</plugins>

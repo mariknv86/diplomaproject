@@ -16,7 +16,6 @@ import ru.mariknv86.blog.model.enums.GlobalSetting;
 
 @Data
 @Entity
-@Builder
 @Table(name = "global_settings")
 @AllArgsConstructor
 @NoArgsConstructor

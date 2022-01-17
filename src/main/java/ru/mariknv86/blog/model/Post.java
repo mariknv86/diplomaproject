@@ -39,7 +39,9 @@ public class Post {
     @Column(name = "is_active", nullable = false)
     private byte isActive;
 
-    @Column(name = "moderation_status", columnDefinition="ENUM('NEW','ACCEPTED', 'DECLINED')", nullable = false)
+    @Column(name = "moderation_status",
+        columnDefinition="ENUM('NEW','ACCEPTED', 'DECLINED')",
+        nullable = false)
     @Enumerated(EnumType.STRING)
     private ModerationStatus moderationStatus;
 
@@ -77,10 +79,17 @@ public class Post {
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
     private List<PostComment> comments;
 
-
-
     public void incrementUserView() {
         setViewCount(getViewCount() + 1);
     }
+
+    public long getLikeCount() {
+        return votes.stream().filter(v -> v.getValue() == 1).count();
+    }
+
+    public long getDislikeCount() {
+        return votes.stream().filter(v -> v.getValue() == 0).count();
+    }
+
 
 }

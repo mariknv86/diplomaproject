@@ -12,6 +12,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import ru.mariknv86.blog.model.enums.Role;
 
 @Data
 @Entity
@@ -47,5 +48,9 @@ public class User {
 
     @Column(length = 65535, columnDefinition = "TEXT")
     private String photo;
+
+    public Role getRole() {
+        return isModerator == 1 ? Role.MODERATOR : Role.USER;
+    }
 
 }

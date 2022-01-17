@@ -18,12 +18,10 @@ public class GlobalSettingsService {
 
     public GlobalSettingsDto getGlobalSettings() {
         List<GlobalSettings> globalSettingsList = globalSettingsRepository.findAll();
-        //System.out.println(globalSettingsList.size());
         GlobalSettingsDto globalSettingsDto = new GlobalSettingsDto();
 
         globalSettingsList.forEach(
             setting -> {
-                //System.out.println(setting.getCode() + " " + setting.getValue());
                 if(setting.getCode().equals(GlobalSetting.MULTIUSER_MODE)) {
                     globalSettingsDto.setMultiUserMode(setting.getValue().equalsIgnoreCase("yes"));
                 }
