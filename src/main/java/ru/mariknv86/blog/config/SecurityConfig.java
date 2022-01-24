@@ -1,16 +1,23 @@
 package ru.mariknv86.blog.config;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import ru.mariknv86.blog.dto.response.ResultTrueDto;
 import ru.mariknv86.blog.service.UserService;
 
 
@@ -21,6 +28,7 @@ import ru.mariknv86.blog.service.UserService;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final UserService userService;
+    private final ObjectMapper objectMapper;
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -34,6 +42,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         .and()
         .formLogin().disable()
         .httpBasic();
+
+        http
+            .logout()
+            .logoutUrl(SecurityConstants.LOGOUT_URL)
+            .logoutSuccessHandler(this::logoutSuccessHandler);
+    }
+
+    private void logoutSuccessHandler(HttpServletRequest request,
+        HttpServletResponse response, Authentication authentication) throws IOException {
+        response.setStatus(HttpStatus.OK.value());
+        objectMapper.writeValue(response.getWriter(), new ResultTrueDto());
     }
 
     @Bean

@@ -65,4 +65,14 @@ public class ApiPostController {
         return ResponseEntity.ok(posts);
     }
 
+    @GetMapping("/my")
+    public ResponseEntity<?> getMyPosts(
+        @RequestParam int offset,
+        @RequestParam int limit,
+        @RequestParam String status) {
+        PostListDto posts = postService.getMyPosts(offset, limit, status);
+        return ResponseEntity.ok(posts);
+
+    }
+
 }

@@ -18,15 +18,15 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
      */
     @Query(
         value =
-            "select posts.* "
-                + "from posts "
-                + "left join post_comments "
-                + "on posts.id = post_comments.post_id "
-                + "where posts.is_active = 1 "
-                + "and posts.moderation_status = 'ACCEPTED'"
-                + "and posts.time <= now()"
-                + "group by posts.id "
-                + "order by count(post_comments.post_id) desc",
+            "SELECT posts.* "
+                + "FROM posts "
+                + "LEFT JOIN post_comments "
+                + "ON posts.id = post_comments.post_id "
+                + "WHERE posts.is_active = 1 "
+                + "AND posts.moderation_status = 'ACCEPTED'"
+                + "AND posts.time <= NOW()"
+                + "GROUP BY posts.id "
+                + "ORDER BY count(post_comments.post_id) DESC",
         nativeQuery = true)
     List<Post> getMostPopularPosts(Pageable pageable);
 
@@ -37,12 +37,12 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
         value =
             "SELECT posts.* "
                 + "FROM posts "
-                + "left join post_votes "
-                + "on posts.id = post_votes.post_id "
-                + "where posts.is_active = 1 and posts.moderation_status = 'ACCEPTED' "
-                + "and posts.time <= now() and post_votes.value = 1 "
-                + "group by posts.id "
-                + "order by count(post_votes.post_id) desc",
+                + "LEFT JOIN post_votes "
+                + "ON posts.id = post_votes.post_id "
+                + "WHERE posts.is_active = 1 AND posts.moderation_status = 'ACCEPTED' "
+                + "AND posts.time <= NOW() AND post_votes.value = 1 "
+                + "GROUP BY posts.id "
+                + "ORDER BY COUNT(post_votes.post_id) DESC",
         nativeQuery = true)
     List<Post> getBestPosts(Pageable pageable);
 
@@ -54,9 +54,33 @@ public interface PostRepository extends CrudRepository<Post, Integer> {
             "SELECT count(*) FROM posts "
                 + "WHERE is_active = 1 "
                 + "AND moderation_status = :status "
-                + "AND time <= now()",
+                + "AND time <= NOW()",
         nativeQuery = true)
     int getAllPostsCount (String status);
+
+    /**
+     * запрос общего количества постов для запроса api/post/my
+     */
+    @Query(
+        value =
+            "SELECT COUNT(*) FROM posts "
+                + "WHERE is_active = :isActive "
+                + "AND moderation_status = :moderationStatus "
+                + "AND user_id = :userId",
+        nativeQuery = true)
+    int getMyPostCount(int userId, int isActive, String moderationStatus);
+
+    /**
+     * запрос общего постов для запроса api/post/my
+     */
+    @Query(
+        value =
+            "SELECT * FROM posts "
+                + "WHERE is_active = :isActive "
+                + "AND moderation_status = :moderationStatus "
+                + "AND user_id = :userId",
+        nativeQuery = true)
+    List<Post> getMyPosts(int userId, int isActive, String moderationStatus, Pageable pageable);
 
     /**
      * запрос общего количества постов для запроса api/post/moderate

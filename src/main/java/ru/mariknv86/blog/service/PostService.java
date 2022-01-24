@@ -71,6 +71,42 @@ public class PostService {
             .build();
     }
 
+    public PostListDto getMyPosts(int offset, int limit, String status) {
+        Pageable pageable = PageRequest.of(offset / limit, limit);
+        int isActive = 1;
+        String moderationStatus = "%";
+        int userId = userService.getCurrentUser().getId();
+        if(status.equals("inactive")) {
+            isActive = 0;
+        }
+
+        switch (status) {
+            case "pending": {
+                moderationStatus = "NEW";
+                break;
+            }
+            case "declined": {
+                moderationStatus = "DECLINED";
+                break;
+            }
+            case "published": {
+                moderationStatus = "ACCEPTED";
+                break;
+            }
+
+
+        }
+
+        int count = postRepository.getMyPostCount(userId, isActive, moderationStatus);
+        List<Post> posts = postRepository.getMyPosts(userId, isActive, moderationStatus, pageable);
+
+        return PostListDto.builder()
+            .count(count)
+            .posts(convertToPostDto(posts))
+            .build();
+
+    }
+
     public PostListDto getPostsForModeration(int offset, int limit, String status) {
         int moderatorId = userService.getCurrentUser().getId();
         Pageable pageable = PageRequest.of(offset / limit, limit);
