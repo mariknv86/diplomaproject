@@ -14,6 +14,7 @@ import org.patchca.filter.predefined.CurvesRippleFilterFactory;
 import org.patchca.font.RandomFontFactory;
 import org.patchca.service.ConfigurableCaptchaService;
 import org.patchca.utils.encoder.EncoderHelper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,7 +35,6 @@ import ru.mariknv86.blog.utils.RandomStringGenerator;
 @Service
 @Transactional
 @AllArgsConstructor
-@NoArgsConstructor
 public class AuthService {
 
     private static final String DATA_PREFIX = "data:image/png;base64,";
@@ -42,10 +42,12 @@ public class AuthService {
 
     private static final int MIN_PASSWORD_LENGTH = 6;
 
+
     private CaptchaRepository captchaRepository;
     private UserRepository userRepository;
     private UserDtoToUser userDtoToUser;
     private PasswordEncoder passwordEncoder;
+
     private CaptchaToCaptchaDto captchaToCaptchaDto;
 
     public ResultsResponseDto<?> registerNewUser(UserRequestDto dto) {
@@ -89,29 +91,31 @@ public class AuthService {
     public CaptchaResponseDto genAndSaveCaptcha() {
 
         ConfigurableCaptchaService cs = new ConfigurableCaptchaService();
-        cs.setWidth(100);
-        cs.setFontFactory(new RandomFontFactory(30, new String[] {"Verdana"}));
+        cs.setWidth(200);
+        cs.setFontFactory(new RandomFontFactory(50, new String[] {"Verdana"}));
         cs.setColorFactory(new SingleColorFactory(new Color(25, 60, 170)));
         cs.setFilterFactory(new CurvesRippleFilterFactory(cs.getColorFactory()));
-
-        CaptchaCode captchaCode;
 
         try(ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
             String plainCode = EncoderHelper.getChallangeAndWriteImage(
                 cs, "png", byteArrayOutputStream);
             String encodedCode = DATA_PREFIX + Base64.getEncoder()
                 .encodeToString(byteArrayOutputStream.toByteArray());
-            captchaCode =
-                new CaptchaCode()
-                    .setCode(plainCode)
-                    .setSecretCode(RandomStringGenerator.randomString(5))
-                    .setTime(LocalDateTime.now());
-            captchaRepository.save(captchaCode);
-            return captchaToCaptchaDto.map(captchaCode).setImage(encodedCode);
+            CaptchaCode captchaCode = CaptchaCode.builder()
+                .code(plainCode)
+                .secretCode(RandomStringGenerator.randomString(5))
+                .time(LocalDateTime.now())
+                .build();
+            if(captchaRepository != null) {
+                captchaRepository.save(captchaCode);
+                return captchaToCaptchaDto.map(captchaCode).setImage(encodedCode);
+            }
+
         } catch (IOException e) {
             throw new InvalidCaptchaException("Error generating captcha");
 
         }
+        return null;
     }
 
 

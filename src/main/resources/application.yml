@@ -14,7 +14,7 @@ globalSettings:
     -
       code: 'MULTIUSER_MODE'
       name: 'Многопользовательский режим'
-      value: 'NO'
+      value: 'YES'
     -
       code: 'POST_PREMODERATION'
       name: 'Премодерация постов'
