@@ -39,7 +39,7 @@ public class PostService {
     private final UserService userService;
 
     public PostListDto getPosts(int offset, int limit, String mode) {
-        int count = postRepository.getAllPostsCount("ACCEPTED");
+        int count = postRepository.getAllPostsCount(ModerationStatus.ACCEPTED.toString());
         SortMode sortMode = SortMode.valueOf(mode.toUpperCase());
         Pageable pageable = PageRequest.of(offset / limit, limit);
         List<Post> posts;
@@ -72,25 +72,29 @@ public class PostService {
     }
 
     public PostListDto getMyPosts(int offset, int limit, String status) {
+        final String statusInactive = "inactive";
+        final String statusPending = "pending";
+        final String statusDeclined = "declined";
+        final String statusPublished = "published";
         Pageable pageable = PageRequest.of(offset / limit, limit);
         int isActive = 1;
         String moderationStatus = "%";
         int userId = userService.getCurrentUser().getId();
-        if(status.equals("inactive")) {
+        if(status.equals(statusInactive)) {
             isActive = 0;
         }
 
         switch (status) {
-            case "pending": {
-                moderationStatus = "NEW";
+            case statusPending: {
+                moderationStatus = ModerationStatus.NEW.toString();
                 break;
             }
-            case "declined": {
-                moderationStatus = "DECLINED";
+            case statusDeclined: {
+                moderationStatus = ModerationStatus.DECLINED.toString();
                 break;
             }
-            case "published": {
-                moderationStatus = "ACCEPTED";
+            case statusPublished: {
+                moderationStatus = ModerationStatus.ACCEPTED.toString();
                 break;
             }
 
@@ -176,7 +180,7 @@ public class PostService {
 
     public PostListDto searchByQuery(int offset, int limit, String query) {
         if(query.isEmpty()) {
-            return getPosts(offset, limit, "BEST");
+            return getPosts(offset, limit, SortMode.BEST.toString());
         } else {
             int count = postRepository.getCountByQuery(query);
             Pageable pageable = PageRequest.of(offset / limit, limit);

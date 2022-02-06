@@ -14,6 +14,9 @@ import ru.mariknv86.blog.repository.GlobalSettingsRepository;
 @AllArgsConstructor
 public class GlobalSettingsService {
 
+    private static final String yes = "yes";
+    private static final String no = "no";
+
     private final GlobalSettingsRepository globalSettingsRepository;
 
     public GlobalSettingsDto getGlobalSettings() {
@@ -23,13 +26,13 @@ public class GlobalSettingsService {
         globalSettingsList.forEach(
             setting -> {
                 if(setting.getCode().equals(GlobalSetting.MULTIUSER_MODE)) {
-                    globalSettingsDto.setMultiUserMode(setting.getValue().equalsIgnoreCase("yes"));
+                    globalSettingsDto.setMultiUserMode(setting.getValue().equalsIgnoreCase(yes));
                 }
                 if(setting.getCode().equals(GlobalSetting.POST_PREMODERATION)) {
-                    globalSettingsDto.setPostPreModeration(setting.getValue().equalsIgnoreCase("yes"));
+                    globalSettingsDto.setPostPreModeration(setting.getValue().equalsIgnoreCase(no));
                 }
                 if(setting.getCode().equals(GlobalSetting.STATISTICS_IS_PUBLIC)) {
-                    globalSettingsDto.setStatisticsIsPublic(setting.getValue().equalsIgnoreCase("yes"));
+                    globalSettingsDto.setStatisticsIsPublic(setting.getValue().equalsIgnoreCase(yes));
                 }
             });
 
@@ -38,37 +41,41 @@ public class GlobalSettingsService {
 
     public void setGlobalSettings(GlobalSettingsDto globalSettingsDto) {
         globalSettingsRepository.updateValue
-            (globalSettingsDto.isMultiUserMode() ? "yes" : "no",
+            (globalSettingsDto.isMultiUserMode() ? yes : no,
                 GlobalSetting.MULTIUSER_MODE.toString());
         globalSettingsRepository.updateValue
-            (globalSettingsDto.isPostPreModeration() ? "yes" : "no",
+            (globalSettingsDto.isPostPreModeration() ? yes : no,
                 GlobalSetting.POST_PREMODERATION.toString());
         globalSettingsRepository.updateValue
-            (globalSettingsDto.isStatisticsIsPublic() ? "yes" : "no",
+            (globalSettingsDto.isStatisticsIsPublic() ? yes : no,
                 GlobalSetting.STATISTICS_IS_PUBLIC.toString());
     }
 
     @PostConstruct
     private void initSettings() {
+        final String multiUserModeValue = "Многопользовательский режим";
+        final String postPreModerationValue = "Премодерация постов";
+        final String statisticsIsPublicValue = "Показывать всем статистику блога";
+
         List<GlobalSettings> globalSettingsList = new ArrayList<>();
 
         GlobalSettings multiUserMode = new GlobalSettings();
         multiUserMode.setId(1);
-        multiUserMode.setName("Многопользовательский режим");
+        multiUserMode.setName(multiUserModeValue);
         multiUserMode.setCode(GlobalSetting.MULTIUSER_MODE);
-        multiUserMode.setValue("yes");
+        multiUserMode.setValue(yes);
 
         GlobalSettings postPreModeration = new GlobalSettings();
         postPreModeration.setId(2);
-        postPreModeration.setName("Премодерация постов");
+        postPreModeration.setName(postPreModerationValue);
         postPreModeration.setCode(GlobalSetting.POST_PREMODERATION);
-        postPreModeration.setValue("yes");
+        postPreModeration.setValue(yes);
 
         GlobalSettings statisticsIsPublic = new GlobalSettings();
         statisticsIsPublic.setId(3);
-        statisticsIsPublic.setName("Показывать всем статистику блога");
+        statisticsIsPublic.setName(statisticsIsPublicValue);
         statisticsIsPublic.setCode(GlobalSetting.STATISTICS_IS_PUBLIC);
-        statisticsIsPublic.setValue("yes");
+        statisticsIsPublic.setValue(yes);
     }
 
 

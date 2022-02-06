@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.mariknv86.blog.dto.response.TagDto;
 import ru.mariknv86.blog.dto.response.TagsResponseDto;
 import ru.mariknv86.blog.model.Tag;
+import ru.mariknv86.blog.model.enums.ModerationStatus;
 import ru.mariknv86.blog.repository.PostRepository;
 import ru.mariknv86.blog.repository.TagRepository;
 
@@ -30,7 +31,7 @@ public class TagService {
 
         int mostPopularTagId = tagRepository.getMostPopularTagId();
         int mostPopularTagPostsCount = tagRepository.getTagLinksCount(mostPopularTagId);
-        int allPostsCount = postRepository.getAllPostsCount("ACCEPTED");
+        int allPostsCount = postRepository.getAllPostsCount(ModerationStatus.ACCEPTED.toString());
         float mostPopularTagWeight = (float) mostPopularTagPostsCount / allPostsCount;
         float normalizationRatio = 1 / mostPopularTagWeight;
 
