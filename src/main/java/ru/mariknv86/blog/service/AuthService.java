@@ -3,6 +3,7 @@ package ru.mariknv86.blog.service;
 import java.awt.Color;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.PrivilegedAction;
 import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Map;
@@ -39,6 +40,13 @@ public class AuthService {
 
     private static final String DATA_PREFIX = "data:image/png;base64,";
     private static final String DEFAULT_AVATAR = "/default-1.png";
+    private static final String WRONG_CAPTCHA_MSG_KEY = "captcha";
+    private static final String WRONG_CAPTCHA_MSG_VALUE = "Код с картинки введён неверно";
+    private static final String ERROR_GENERATING_CAPTCHA_MSG = "Не удалось сгенерировать капчу!";
+    private static final String WRONG_EMAIL_MSG_KEY = "email";
+    private static final String WRONG_EMAIL_MSG_VALUE = "Этот e-mail уже зарегистрирован";
+    private static final String WRONG_PASSWORD_MSG_KEY = "password";
+    private static final String WRONG_PASSWORD_MSG_VALUE = "Пароль короче 6-ти символов";
 
     private static final int MIN_PASSWORD_LENGTH = 6;
 
@@ -54,17 +62,19 @@ public class AuthService {
         String captchaCode = captchaRepository.findCaptchaCodeBySecret(dto.getCaptchaSecret());
 
         if(captchaCode == null) {
-            throw new InvalidAttributeException(Map.of("captcha", "Код с картинки введён неверно"));
+            throw new InvalidAttributeException(Map.of(WRONG_CAPTCHA_MSG_KEY,
+                WRONG_CAPTCHA_MSG_VALUE));
         } else {
             validateCaptcha(dto.getCaptcha(), captchaCode);
         }
 
         if(userRepository.findByEmail(dto.getEmail()).isPresent()) {
-            throw new InvalidAttributeException(Map.of("email", "Этот e-mail уже зарегистрирован"));
+            throw new InvalidAttributeException(Map.of(WRONG_EMAIL_MSG_KEY, WRONG_EMAIL_MSG_VALUE));
         }
 
         if(dto.getPassword().length() < MIN_PASSWORD_LENGTH) {
-            throw new InvalidAttributeException(Map.of("password", "Пароль короче 6-ти символов"));
+            throw new InvalidAttributeException(Map.of(WRONG_PASSWORD_MSG_KEY,
+                WRONG_PASSWORD_MSG_VALUE));
         }
         dto.setPassword(passwordEncoder.encode(dto.getPassword()));
         User user = userDtoToUser.map(dto);
@@ -83,7 +93,7 @@ public class AuthService {
 
     private void validateCaptcha(String entered, String actual) {
         if(!entered.equals(actual)) {
-            throw new InvalidCaptchaException("Код с картинки введён неверно");
+            throw new InvalidCaptchaException(WRONG_CAPTCHA_MSG_VALUE);
         }
 
     }
@@ -112,7 +122,7 @@ public class AuthService {
             }
 
         } catch (IOException e) {
-            throw new InvalidCaptchaException("Error generating captcha");
+            throw new InvalidCaptchaException(ERROR_GENERATING_CAPTCHA_MSG);
 
         }
         return null;

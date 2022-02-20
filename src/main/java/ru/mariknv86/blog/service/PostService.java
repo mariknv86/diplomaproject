@@ -1,7 +1,10 @@
 package ru.mariknv86.blog.service;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -10,14 +13,17 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.mariknv86.blog.dto.request.PostRequestDto;
 import ru.mariknv86.blog.dto.response.CalendarDto;
 import ru.mariknv86.blog.dto.response.CommentPartDto;
 import ru.mariknv86.blog.dto.response.MapDto;
 import ru.mariknv86.blog.dto.response.OnePostDto;
 import ru.mariknv86.blog.dto.response.PostDto;
 import ru.mariknv86.blog.dto.response.PostListDto;
+import ru.mariknv86.blog.dto.response.ResultsResponseDto;
 import ru.mariknv86.blog.dto.response.UserForPostDto;
 import ru.mariknv86.blog.dto.response.UserPartInfoDto;
+import ru.mariknv86.blog.mapper.PostRequestToPost;
 import ru.mariknv86.blog.model.Post;
 import ru.mariknv86.blog.model.PostComment;
 import ru.mariknv86.blog.model.Tag;
@@ -25,6 +31,7 @@ import ru.mariknv86.blog.model.User;
 import ru.mariknv86.blog.model.enums.ModerationStatus;
 import ru.mariknv86.blog.model.enums.SortMode;
 import ru.mariknv86.blog.repository.PostRepository;
+import ru.mariknv86.blog.repository.TagRepository;
 import ru.mariknv86.blog.utils.Utils;
 
 @Service
@@ -36,7 +43,11 @@ public class PostService {
     final String ANNOUNCE_TAIL = "...";
 
     private final PostRepository postRepository;
+    private final TagRepository tagRepository;
     private final UserService userService;
+    private final PostRequestToPost postRequestToPost;
+    private final String DATE_NOT_SET_MSG = "Date not set";
+    private final String POST_NOT_FOUND_MSG = "Post not found !";
 
     public PostListDto getPosts(int offset, int limit, String mode) {
         int count = postRepository.getAllPostsCount(ModerationStatus.ACCEPTED.toString());
@@ -195,7 +206,7 @@ public class PostService {
 
     public PostListDto getPostsByDate(int offset, int limit, String date) {
         if(date.isEmpty()) {
-            throw new IllegalArgumentException("Date not set");
+            throw new IllegalArgumentException(DATE_NOT_SET_MSG);
         }
         int count = postRepository.getCountByDate(date);
         Pageable pageable = PageRequest.of(offset / limit, limit);
@@ -210,7 +221,7 @@ public class PostService {
 
     public PostListDto getPostsByTag(int offset, int limit, String tag) {
         if(tag.isEmpty()) {
-            throw new IllegalArgumentException("Date not set");
+            throw new IllegalArgumentException(DATE_NOT_SET_MSG);
         }
         int count = postRepository.getCountByTag(tag);
         Pageable pageable = PageRequest.of(offset / limit, limit);
@@ -240,9 +251,9 @@ public class PostService {
             .build();
     }
 
-    public OnePostDto getPostById(int id) {
+    public OnePostDto getPost(int id) {
         Post post = postRepository.findById(id)
-            .orElseThrow(() -> new EntityNotFoundException("Post not found !"));
+            .orElseThrow(() -> new EntityNotFoundException(POST_NOT_FOUND_MSG));
 
         User user = post.getUser();
         UserForPostDto userForPostDto = UserForPostDto.builder()
@@ -277,6 +288,7 @@ public class PostService {
             .timestamp(Utils.convertLocalDateTimeToMillis(post.getTime()))
             .user(userForPostDto)
             .title(post.getTitle())
+            .text(post.getText())
             .likeCount(post.getLikeCount())
             .dislikeCount(post.getDislikeCount())
             .viewCount(post.getViewCount())
@@ -284,4 +296,53 @@ public class PostService {
             .tags(tagsList)
             .build();
     }
+
+    public Post getPostById(int postId) {
+        return postRepository.findById(postId).orElseThrow(
+            () -> new EntityNotFoundException(POST_NOT_FOUND_MSG));
+    }
+
+    public ResultsResponseDto<Boolean> addNewPost(PostRequestDto dto) {
+        Post post = postRequestToPost.mapNew(dto);
+        post.setUser(userService.getCurrentUser());
+        post.setTagList(updateTags(dto.getTags()));
+        postRepository.save(post);
+        return new ResultsResponseDto<Boolean>().setResult(true);
+
+    }
+
+    public ResultsResponseDto<Boolean> editPost(PostRequestDto dto, int postId) {
+        Post origin = getPostById(postId);
+        Post editedPost = postRequestToPost.mapEdit(dto);
+        editedPost.setId(origin.getId());
+        editedPost.setUser(origin.getUser());
+        editedPost.setModerator(origin.getModerator());
+
+        if(userService.isUserModerator()) {
+            editedPost.setModerationStatus(origin.getModerationStatus());
+        }
+
+        editedPost.setTagList(updateTags(dto.getTags()));
+        postRepository.save(editedPost);
+        return new ResultsResponseDto<Boolean>().setResult(true);
+    }
+
+    List<Tag> updateTags(String[] tagStrings) {
+        List<String> tags = Arrays.asList(tagStrings);
+        List<Tag> tagsInDB = tagRepository.findAllByNameIn(tags);
+
+        List<String> tagsInDBNames = tagsInDB.stream()
+            .map(Tag::getName)
+            .collect(Collectors.toList());
+        List<Tag> newTagList = tags.stream().filter(tag -> !tagsInDBNames.contains(tag))
+            .map(Tag::new)
+            .collect(Collectors.toList());
+
+        if(!newTagList.isEmpty()) {
+            newTagList = tagRepository.saveAll(newTagList);
+            tagsInDB.addAll(newTagList);
+        }
+        return tagsInDB;
+    }
+
 }

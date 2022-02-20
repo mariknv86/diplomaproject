@@ -10,12 +10,15 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Data
 @Entity
 @Builder
 @Table(name = "tags")
 @AllArgsConstructor
+@RequiredArgsConstructor
 @NoArgsConstructor
 public class Tag {
 
@@ -25,6 +28,7 @@ public class Tag {
     private int id;
 
     @Column(nullable = false)
+    @NonNull
     private String name;
 
 }

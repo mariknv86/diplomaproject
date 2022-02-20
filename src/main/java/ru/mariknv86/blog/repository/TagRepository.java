@@ -9,6 +9,8 @@ import ru.mariknv86.blog.model.Tag;
 @Repository
 public interface TagRepository extends JpaRepository<Tag, Integer> {
 
+    List<Tag> findAllByNameIn(List<String> tagList);
+
     List<Tag> findAllByNameContaining(String query);
 
     @Query(nativeQuery = true, value = "SELECT COUNT(*) FROM tag2post WHERE tag_id = :tagId")

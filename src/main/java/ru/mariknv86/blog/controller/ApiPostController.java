@@ -1,14 +1,20 @@
 package ru.mariknv86.blog.controller;
 
+import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.mariknv86.blog.dto.request.PostRequestDto;
 import ru.mariknv86.blog.dto.response.PostListDto;
+import ru.mariknv86.blog.dto.response.ResultsResponseDto;
 import ru.mariknv86.blog.service.PostService;
 
 @RestController
@@ -53,7 +59,7 @@ public class ApiPostController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getById(@PathVariable int id) {
-        return ResponseEntity.ok(postService.getPostById(id));
+        return ResponseEntity.ok(postService.getPost(id));
     }
 
     @GetMapping("/moderation")
@@ -72,7 +78,17 @@ public class ApiPostController {
         @RequestParam String status) {
         PostListDto posts = postService.getMyPosts(offset, limit, status);
         return ResponseEntity.ok(posts);
+    }
 
+    @PostMapping
+    public ResponseEntity<?> addPost(@Valid @RequestBody PostRequestDto postDto) {
+        return  ResponseEntity.ok(postService.addNewPost(postDto));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> editPost(@Valid @RequestBody PostRequestDto postDto,
+        @PathVariable int id) {
+        return ResponseEntity.ok(postService.editPost(postDto, id));
     }
 
 }
