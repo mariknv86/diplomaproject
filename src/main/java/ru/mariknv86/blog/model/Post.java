@@ -73,7 +73,7 @@ public class Post {
     )
     private List<Tag> tagList;
 
-    @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL)
     private List<PostVote> votes;
 
     @OneToMany(mappedBy = "postId", cascade = CascadeType.ALL)

@@ -12,18 +12,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.mariknv86.blog.dto.request.LikeDislikeRequestDto;
 import ru.mariknv86.blog.dto.request.PostRequestDto;
 import ru.mariknv86.blog.dto.response.PostListDto;
 import ru.mariknv86.blog.dto.response.ResultsResponseDto;
 import ru.mariknv86.blog.service.PostService;
+import ru.mariknv86.blog.service.PostVoteService;
 
 @RestController
 @RequestMapping(value = "/api/post")
 @RequiredArgsConstructor
 public class ApiPostController {
 
-    @Autowired
-    private PostService postService;
+    //@Autowired
+    private final PostService postService;
+    private final PostVoteService postVoteService;
 
     @GetMapping
     public ResponseEntity<?> getAllPosts(
@@ -89,6 +92,18 @@ public class ApiPostController {
     public ResponseEntity<?> editPost(@Valid @RequestBody PostRequestDto postDto,
         @PathVariable int id) {
         return ResponseEntity.ok(postService.editPost(postDto, id));
+    }
+
+    @PostMapping("/like")
+    public ResponseEntity<?> setLikeToPost(@RequestBody LikeDislikeRequestDto likeOrDislike) {
+        return ResponseEntity.ok(postVoteService.setLikeOrDislikeToPost(
+            likeOrDislike.getPostId(), 1));
+    }
+
+    @PostMapping("/dislike")
+    public ResponseEntity<?> setDislikeToPost(@RequestBody LikeDislikeRequestDto likeOrDislike) {
+        return ResponseEntity.ok(postVoteService.setLikeOrDislikeToPost(
+            likeOrDislike.getPostId(), -1));
     }
 
 }

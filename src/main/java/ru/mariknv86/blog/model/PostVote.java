@@ -29,11 +29,11 @@ public class PostVote {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User userId;
+    private User user;
 
     @ManyToOne
     @JoinColumn(name = "post_id")
-    private Post postId;
+    private Post post;
 
     @Column(nullable = false)
     private LocalDateTime time;

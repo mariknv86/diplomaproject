@@ -1,8 +1,6 @@
 package ru.mariknv86.blog.service;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,11 +24,13 @@ import ru.mariknv86.blog.dto.response.UserPartInfoDto;
 import ru.mariknv86.blog.mapper.PostRequestToPost;
 import ru.mariknv86.blog.model.Post;
 import ru.mariknv86.blog.model.PostComment;
+import ru.mariknv86.blog.model.PostVote;
 import ru.mariknv86.blog.model.Tag;
 import ru.mariknv86.blog.model.User;
 import ru.mariknv86.blog.model.enums.ModerationStatus;
 import ru.mariknv86.blog.model.enums.SortMode;
 import ru.mariknv86.blog.repository.PostRepository;
+import ru.mariknv86.blog.repository.PostVoteRepository;
 import ru.mariknv86.blog.repository.TagRepository;
 import ru.mariknv86.blog.utils.Utils;
 
